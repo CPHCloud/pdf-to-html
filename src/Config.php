@@ -1,6 +1,6 @@
 <?php
 
-namespace Gufy\PdfToHtml;
+namespace Gswits\PdfToHtml;
 
 use Illuminate\Config\Repository;
 

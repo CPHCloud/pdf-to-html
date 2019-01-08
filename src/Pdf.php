@@ -1,6 +1,9 @@
 <?php
 
-namespace Gufy\PdfToHtml;
+namespace Gswits\PdfToHtml;
+
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class Pdf
 {
@@ -27,15 +30,16 @@ class Pdf
 
     protected function info()
     {
+        $process = new Process(array($this->bin(), $this->file));
 
-        if (PHP_OS === 'WINNT') {
-            $content = shell_exec('"'.$this->bin().'" "'.$this->file.'"');
-        }
-        else {
-            $content = shell_exec($this->bin()." '".$this->file."'");
+        $process->run();
+        
+        if (! $process->isSuccessful()) {
+            throw new ProcessFailedException($process);
         }
 
-        // print_r($info);
+        $content =  $process->getOutput();
+            
         $options = explode("\n", $content);
         $info = [];
         foreach ($options as &$item) {

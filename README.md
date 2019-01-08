@@ -1,40 +1,45 @@
 [![Build Status](https://travis-ci.org/mgufrone/pdf-to-html.svg?branch=master)](https://travis-ci.org/mgufrone/pdf-to-html)
 [![Coverage Status](https://coveralls.io/repos/github/mgufrone/pdf-to-html/badge.svg?branch=master)](https://coveralls.io/github/mgufrone/pdf-to-html?branch=master)
 
-
-
 # PDF to HTML PHP Class
 
-This class brought to you so you can use php and poppler-utils convert your pdf files to html file
-
-## Important Notes
-
-Please see how to use below, since it's really upgraded and things in this package has already changed.
+A simple class for converting PDF files into HTML documents. This package was forked from the [original maintainer](https://github.com/mgufrone/pdf-to-html). As it has since been abandoned, I've decided to migrate the package and port it so that it can be used in php 7.1+ environments.
 
 ## Installation
 
-When you are in your active directory apps, you can just run this command to add this package on your app
-
 ```
-	composer require gufy/pdftohtml-php:~2
+composer require garrensweet/pdftohtml-php
 ```
 
 Or add this package to your `composer.json`
 
 ```json
 {
-	"gufy/pdftohtml-php":"~2"
+  "garrensweet/pdftohtml-php": "^0.1.0"
 }
 ```
 
 ## Requirements
-1. Poppler-Utils (if you are using Ubuntu Distro, just install it from apt )
-	`sudo apt-get install poppler-utils`
-2. PHP Configuration with shell access enabled
+
+1. You **must** install the `poppler-utils` package on your system. You must also make sure that the user who owns `poppler-utils` aligns with the your `Nginx` user, otherwise you will not be able to access this package.
+
+2. Before instantiating the `Pdf` class, you will need to tell the library about the location of your binaries. Without this, the default fallback will be used (which is likely incorrect for most people) and you will receive a generic error. You may do this by using the `Config::set` method of this class.
+
+> Note: The `Config` method is the same repository implementation that Laravel uses.
+
+```php
+\Gswits\PdfToHtml\Config::set('pdftohtml.bin', '/usr/local/bin/pdftohtml');
+
+\Gswits\PdfToHtml\Config::set('pdfinfo.bin', '/usr/local/bin/pdfinfo');
+```
 
 ## Usage
 
-Here is the sample.
+Having setup your poll-utils package and provided the location to the library, you can proceed with the following:
+
+> WARNING! If you're not working in an environment that automatically loads the vendor list from composer, you will need to manually do so yourself by adding `include /vendor/autoload.php` at the top of your file. If you're in Laravel, you do not need this.
+
+### An example use case follows:
 
 ```php
 <?php
@@ -42,7 +47,7 @@ Here is the sample.
 include 'vendor/autoload.php';
 
 // initiate
-$pdf = new Gufy\PdfToHtml\Pdf('file.pdf');
+$pdf = new Gswits\PdfToHtml\Pdf('file.pdf');
 
 // convert to html string
 $html = $pdf->html();
@@ -50,7 +55,7 @@ $html = $pdf->html();
 // convert a specific page to html string
 $page = $pdf->html(3);
 
-// convert to html and return it as [Dom Object](https://github.com/paquettg/php-html-parser)
+// convert to html and return it as [Dom Object](https://github.com/thesoftwarefanatics/php-html-parser)
 $dom = $pdf->getDom();
 
 // check if your pdf has more than one pages
@@ -61,49 +66,48 @@ $dom->goToPage(3);
 
 // and then you can do as you please with that dom, you can find any element you want
 $paragraphs = $dom->find('body > p');
-
-// change pdftohtml bin location
-\Gufy\PdfToHtml\Config::set('pdftohtml.bin', '/usr/local/bin/pdftohtml');
-
-// change pdfinfo bin location
-\Gufy\PdfToHtml\Config::set('pdfinfo.bin', '/usr/local/bin/pdfinfo');
 ?>
 ```
 
-###Passing options to getDOM
-By default `getDom()` extracts all images and creates a html file per page. You can pass options when extracting html:
+### Passing options to getDOM
+
+By default `getDom()` will extract all of the images contained in the pdf. If you do not wish to maintain the images, you can specify this property prior to calling `\$pdf->html() to generate your HTML document.
 
 ```php
 <?php
 $pdfDom = $pdf->getDom(['ignoreImages' => true]);
 ```
-###Available Options
-* singlePage, default: false
-* imageJpeg, default: false
-* ignoreImages, default: false
-* zoom, default: 1.5
-* noFrames, default: true
+
+### Available Options
+
+Additionally, you may pass several arguments to the `Pdf` constructor. These arguments are passed as flags to the underlying `pdftohtml` binary. You can [view the man page for a full list of options](https://www.mankier.com/1/pdftohtml)
+
+- singlePage, default: false
+- imageJpeg, default: false
+- ignoreImages, default: false
+- zoom, default: 1.5
+- noFrames, default: true
 
 ## Usage note for Windows Users
+
 For those who need this package in windows, there is a way. First download poppler-utils for windows here <http://blog.alivate.com.au/poppler-windows/>. And download the latest binary.
 
 After download it, extract it. There will be a directory called `bin`. We will need this one. Then change your code like this
-
 
 ```php
 <?php
 // if you are using composer, just use this
 include 'vendor/autoload.php';
-use Gufy\PdfToHtml\Config;
+use Gswits\PdfToHtml\Config;
 // change pdftohtml bin location
 Config::set('pdftohtml.bin', 'C:/poppler-0.37/bin/pdftohtml.exe');
 
 // change pdfinfo bin location
 Config::set('pdfinfo.bin', 'C:/poppler-0.37/bin/pdfinfo.exe');
 // initiate
-$pdf = new Gufy\PdfToHtml\Pdf('file.pdf');
+$pdf = new Gswits\PdfToHtml\Pdf('file.pdf');
 
-// convert to html and return it as [Dom Object](https://github.com/paquettg/php-html-parser)
+// convert to html and return it as [Dom Object](hhttps://github.com/thesoftwarefanatics/php-html-parser)
 $html = $pdf->html();
 
 // check if your pdf has more than one pages
@@ -127,11 +131,13 @@ Thanks to @kaleidoscopique for giving a try and make it run on OS/X for this pac
 Brew is a famous package manager on OS/X : http://brew.sh/ (aptitude style).
 
 **2. Install poppler**
+
 ```bash
 brew install poppler
 ```
 
 **3. Verify the path of pdfinfo and pdftohtml**
+
 ```bash
 $ which pdfinfo
 /usr/local/bin/pdfinfo
@@ -140,7 +146,7 @@ $ which pdftohtml
 /usr/local/bin/pdfinfo
 ```
 
-**4. Whatever the paths are, use ```Gufy\PdfToHtml\Config::set``` to set them in your php code**. Obviously, use the same path as the one given by the ```which``` command;
+**4. Whatever the paths are, use `Gswits\PdfToHtml\Config::set` to set them in your php code**. Obviously, use the same path as the one given by the `which` command;
 
 ```php
 <?php
@@ -148,15 +154,15 @@ $ which pdftohtml
 include 'vendor/autoload.php';
 
 // change pdftohtml bin location
-\Gufy\PdfToHtml\Config::set('pdftohtml.bin', '/usr/local/bin/pdftohtml');
+\Gswits\PdfToHtml\Config::set('pdftohtml.bin', '/usr/local/bin/pdftohtml');
 
 // change pdfinfo bin location
-\Gufy\PdfToHtml\Config::set('pdfinfo.bin', '/usr/local/bin/pdfinfo');
+\Gswits\PdfToHtml\Config::set('pdfinfo.bin', '/usr/local/bin/pdfinfo');
 
 // initiate
-$pdf = new Gufy\PdfToHtml\Pdf('file.pdf');
+$pdf = new Gswits\PdfToHtml\Pdf('file.pdf');
 
-// convert to html and return it as [Dom Object](https://github.com/paquettg/php-html-parser)
+// convert to html and return it as [Dom Object](https://github.com/thesoftwarefanatics/php-html-parser)
 $html = $pdf->html();
 ?>
 ```
