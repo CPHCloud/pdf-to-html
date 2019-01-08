@@ -2,7 +2,7 @@
   "name": "garrensweet/pdftohtml-php",
   "description": "PDF to HTML converter with PHP using Poppler-utils",
   "license": "MIT",
-  "version": "0.1.2",
+  "version": "2.1.0",
   "authors": [
     {
       "name": "Garren Sweet",
