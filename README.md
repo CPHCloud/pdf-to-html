@@ -15,7 +15,7 @@ Or add this package to your `composer.json`
 
 ```json
 {
-  "garrensweet/pdftohtml-php": "^0.1.0"
+  "garrensweet/pdftohtml-php": "^2.1.0"
 }
 ```
 
