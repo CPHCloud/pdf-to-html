@@ -54,7 +54,10 @@ class Html extends Dom
         for ($i = 1; $i <= $pages; $i++) {
             $content = file_get_contents($base_path.'-'.$i.'.html');
             $content = str_replace("Â", "", $content);
-            if ($this->inlineCss()) {
+
+            if ( !$content) {
+                $content = "";
+            } else if ($content && $this->inlineCss()) {
                 $dom = new DOMDocument();
                 $dom->loadHTML($content);
                 $xpath = new DOMXPath($dom);

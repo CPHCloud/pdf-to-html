@@ -99,7 +99,7 @@ class Base
      */
     public function generateOptions()
     {
-        $generated = [];
+        $generated = ['-nodrm'];
         array_walk($this->options, function ($value, $key) use (&$generated) {
             $result = "";
             switch ($key) {
