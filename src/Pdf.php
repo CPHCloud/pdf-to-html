@@ -10,8 +10,9 @@ class Pdf
     protected $file;
     protected $info;
 
-    public function __construct($file, $options = [])
+    public function __construct($file, $options = [], $logger = null)
     {
+        $this->logger = $logger;
         $this->file = $file;
         $class = $this;
         array_walk($options, function ($item, $key) use ($class) {
@@ -57,7 +58,7 @@ class Pdf
     {
         $this->checkInfo();
 
-        return new Html($this->file, $options);
+        return new Html($this->file, $options, $this->logger);
     }
 
     public function html($page = 1, $options = [])

@@ -22,8 +22,9 @@ class Html extends Dom
         'noFrames'   => false,
     ];
 
-    public function __construct($pdf_file, $options = [])
+    public function __construct($pdf_file, $options = [], $logger = null)
     {
+        $this->logger = $logger;
         $this->filesystem = new Filesystem();
 
         $options = array_merge($this->default_options, $options);
@@ -55,8 +56,11 @@ class Html extends Dom
             $content = file_get_contents($base_path.'-'.$i.'.html');
             $content = str_replace("Â", "", $content);
 
-            if ( !$content) {
+            if ( !$content ) {
                 $content = "";
+                if ( $this->logger) {
+                    $this->logger->write('PDF extraction FAILED for ' . $pdf_file . ' exception');
+                }
             } else if ($content && $this->inlineCss()) {
                 $dom = new DOMDocument();
                 $dom->loadHTML($content);
